@@ -1,13 +1,13 @@
 import observe from './observer/index'
 import Component from './compile/index'
-import { parsePath } from './utils/index'
+import { convertNamingFormat, proxyProps, proxy } from './utils/index'
 
 export default class MVue {
   constructor(options) {
     const { el, data, methods, created } = options
     if (data) {
       this.data = typeof data === 'function' ? data() : data
-      this.proxy(this.data)
+      proxy(this.data, this)
       observe(this.data)
     }
     Object.assign(this, methods)
@@ -39,7 +39,7 @@ export default class MVue {
               proxyProps({
                 cMVue: mVue,
                 mVue: this,
-                key: convertNamingFormat(item.localName),
+                key: convertNamingFormat(item.localName.slice(1)),
                 exp: item.nodeValue
               })
             })
@@ -52,46 +52,5 @@ export default class MVue {
       }
     })
   }
-  proxy(data) {
-    const me = this
-    // console.log(Object.keys(data))
-    Object.keys(data).forEach(function (key) {
-      Object.defineProperty(me, key, {
-        configurable: false,
-        enumerable: true,
-        get: function () {
-          return me.data[key]
-        },
-        set: function (newVal) {
-          me.data[key] = newVal
-        }
-      })
-    })
-  }
 }
 MVue.Components = {}
-
-function proxyProps(option) {
-  const { cMVue, mVue, key, exp } = option
-  Object.defineProperty(cMVue, key, {
-    configurable: false,
-    enumerable: true,
-    get: function () {
-      const getter = parsePath(exp)
-      return getter.call(mVue, mVue)
-    }
-  })
-}
-
-function convertNamingFormat(name) {
-  let key = name
-  if (/-/.test(key)) {
-    const keyArr = key.split('-')
-    for (let i = 1; i < keyArr.length; i++) {
-      const element = keyArr[i]
-      keyArr[i] = element.replace(element[0], element[0].toUpperCase())
-    }
-    key = keyArr.join('')
-  }
-  return key
-}

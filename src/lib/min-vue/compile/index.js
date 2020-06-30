@@ -1,4 +1,4 @@
-import { parsePath } from '../utils/index'
+import { parsePath, proxyProps, convertNamingFormat } from '../utils/index'
 import Watcher from '../observer/watcher.js'
 import MVue from '../index.js'
 import updater from '../compile/updater'
@@ -7,7 +7,7 @@ class ElementCompiler {
   constructor(mVue, str) {
     const tagName = str.match(/(\w|-)+/)[0]
     this.tagName = tagName
-    this.el = document.createElement(tagName)
+    this.el = null
     // this.el = el
     this.mVue = mVue
     this.propsMatched = str.match(/\[(.+?)\]/)
@@ -19,6 +19,19 @@ class ElementCompiler {
     if (MVue.Components[this.tagName]) {
       const { options, component } = MVue.Components[this.tagName]
       const mVue = new MVue(options)
+      if (this.propsMatched) {
+        this.propsMatched[1].split(',').forEach((item) => {
+          const [key, exp] = item.split('="')
+          if (/:/.test(key)) {
+            proxyProps({
+              cMVue: mVue,
+              mVue: this.mVue,
+              key: convertNamingFormat(key.slice(1)),
+              exp: exp
+            })
+          }
+        })
+      }
       return component.createComponent(mVue)
     } else {
       this.el = document.createElement(this.tagName)
@@ -27,18 +40,17 @@ class ElementCompiler {
       this.event()
       return this.el
     }
-    // this.directive()
-  }
-  directive() {
-    if (this.directiveMatched) {
-      console.log(this.directiveMatched[1])
-    }
   }
   props() {
     if (this.propsMatched) {
-      this.propsMatched[1]
-        .split(',')
-        .forEach((item) => this.el.setAttribute(...item.split('="')))
+      this.propsMatched[1].split(',').forEach((item) => {
+        const [key, exp] = item.split('="')
+        if (/:/.test(key)) {
+          console.log(key)
+        } else {
+          this.el.setAttribute(key, exp)
+        }
+      })
     }
   }
   text(isFirst = false) {
@@ -118,10 +130,8 @@ export default class Component {
       if (/[a-z]/.test(firstCharacter)) {
         const elStr = str.match(/[^>+()]+/)[0]
         str = str.replace(elStr, '')
-        // if (str.match(/%(.+?)\%/)) {
-
-        // }
-        const el = new ElementCompiler(this.mVue, elStr).init()
+        console.log()
+        const el = cycleBind(elStr, this.mVue)
         calculate(el)
       } else {
         str = str.replace(firstCharacter, '')
@@ -182,4 +192,11 @@ export default class Component {
       }
     }
   }
+}
+
+function cycleBind(...args) {
+  const [str, mVue] = args
+  const directiveMatched = str.match(/%(.+?)\%/)
+  console.log(directiveMatched)
+  return new ElementCompiler(mVue, str).init()
 }

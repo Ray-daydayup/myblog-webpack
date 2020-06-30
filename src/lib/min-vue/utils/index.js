@@ -42,11 +42,53 @@ export function parsePath(expPath) {
   return function (object) {
     let obj = object
     for (let i = 0; i < segments.length; i++) {
-      if (!obj) return ''
+      if (typeof obj === 'undefined') return ''
       let exp = segments[i]
       obj = obj[exp]
     }
-    if (!obj) return ''
+    if (typeof obj === 'undefined') return ''
     return obj
   }
+}
+
+export function proxyProps(option) {
+  const { cMVue, mVue, key, exp } = option
+  Object.defineProperty(cMVue, key, {
+    configurable: false,
+    enumerable: true,
+    get: function () {
+      const getter = parsePath(exp)
+      return getter.call(mVue, mVue)
+    }
+  })
+}
+
+export function convertNamingFormat(name) {
+  let key = name
+  if (/-/.test(key)) {
+    const keyArr = key.split('-')
+    for (let i = 1; i < keyArr.length; i++) {
+      const element = keyArr[i]
+      keyArr[i] = element.replace(element[0], element[0].toUpperCase())
+    }
+    key = keyArr.join('')
+  }
+  return key
+}
+
+export function proxy(data, mVue) {
+  const me = mVue
+  // console.log(Object.keys(data))
+  Object.keys(data).forEach(function (key) {
+    Object.defineProperty(me, key, {
+      configurable: false,
+      enumerable: true,
+      get: function () {
+        return me.data[key]
+      },
+      set: function (newVal) {
+        me.data[key] = newVal
+      }
+    })
+  })
 }
