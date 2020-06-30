@@ -46,6 +46,7 @@ export function parsePath(expPath) {
       let exp = segments[i]
       obj = obj[exp]
     }
+    if (!obj) return ''
     return obj
   }
 }

@@ -5,7 +5,7 @@ import '@/styles/index.less'
 import '@/lib/rem.js'
 
 import MVue from '@/components/index'
-import { getCount } from '@/api/index.js'
+import { getCount, getArticleList } from '@/api/index.js'
 
 setTimeout(() => {
   document.querySelector('#mask').style.display = 'none'
@@ -13,23 +13,24 @@ setTimeout(() => {
 const mVue = new MVue({
   el: '#app',
   data: {
-    name: 'ztr',
-    a: '12345454',
-    b: 1521513021,
-    count: {
-      articleCount: 0,
-      categoryCount: 0,
-      tagCount: 0
-    }
+    count: {},
+    recentArticles: []
   },
-  async created() {
-    await this.getCount()
+  created() {
+    this.getCount()
+    this.getRecentArticles()
   },
   methods: {
     async getCount() {
       const res = await getCount()
       if (res.flag) {
         this.count = res.data
+      }
+    },
+    async getRecentArticles() {
+      const res = await getArticleList(1, 5)
+      if (res.flag) {
+        this.recentArticles = res.data
       }
     }
   }

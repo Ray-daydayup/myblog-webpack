@@ -1,23 +1,38 @@
 import { parsePath } from '../utils/index'
 import Watcher from '../observer/watcher.js'
-// import Dep from '../observer/dep.js'
+import MVue from '../index.js'
 import updater from '../compile/updater'
 
 class ElementCompiler {
   constructor(mVue, str) {
-    const tagName = str.match(/\w+/)[0]
+    const tagName = str.match(/(\w|-)+/)[0]
+    this.tagName = tagName
     this.el = document.createElement(tagName)
     // this.el = el
     this.mVue = mVue
     this.propsMatched = str.match(/\[(.+?)\]/)
     this.textMatched = str.match(/\{(.+?)\}/)
     this.eventMatched = str.match(/@(.+?)\@/)
+    // this.directiveMatched = str.match(/%(.+?)\%/)
   }
   init() {
-    this.props()
-    this.el.textContent = this.text(true)
-    this.event()
-    return this.el
+    if (MVue.Components[this.tagName]) {
+      const { options, component } = MVue.Components[this.tagName]
+      const mVue = new MVue(options)
+      return component.createComponent(mVue)
+    } else {
+      this.el = document.createElement(this.tagName)
+      this.props()
+      this.el.textContent = this.text(true)
+      this.event()
+      return this.el
+    }
+    // this.directive()
+  }
+  directive() {
+    if (this.directiveMatched) {
+      console.log(this.directiveMatched[1])
+    }
   }
   props() {
     if (this.propsMatched) {
@@ -103,7 +118,9 @@ export default class Component {
       if (/[a-z]/.test(firstCharacter)) {
         const elStr = str.match(/[^>+()]+/)[0]
         str = str.replace(elStr, '')
+        // if (str.match(/%(.+?)\%/)) {
 
+        // }
         const el = new ElementCompiler(this.mVue, elStr).init()
         calculate(el)
       } else {
