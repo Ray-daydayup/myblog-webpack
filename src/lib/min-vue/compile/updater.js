@@ -3,7 +3,8 @@ export default {
     el.textContent = typeof value === 'undefined' ? '' : value
   },
 
-  html(el, value) {
-    el.innerHTML = typeof value === 'undefined' ? '' : value
+  html(el, children) {
+    el.innerHTML = ''
+    el.appendChild(children)
   }
 }

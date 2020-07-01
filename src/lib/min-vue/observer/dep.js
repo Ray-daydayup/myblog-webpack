@@ -5,9 +5,9 @@ export default class Dep {
   addSub(sub) {
     this.subs.push(sub)
   }
-  notify() {
+  notify(isArrayMethod = false) {
     this.subs.forEach(function (sub) {
-      sub.update()
+      sub.update(isArrayMethod)
     })
   }
 }

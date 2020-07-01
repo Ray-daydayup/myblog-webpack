@@ -15,3 +15,8 @@ export const getArticleList = async function (
   })
   return res
 }
+
+export const getTagList = async function () {
+  const res = await http.get('/tag/list')
+  return res
+}

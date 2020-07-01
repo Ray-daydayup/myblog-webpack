@@ -1,109 +1,9 @@
-import { parsePath, proxyProps, convertNamingFormat } from '../utils/index'
+import { parsePath } from '../utils/index'
 import Watcher from '../observer/watcher.js'
 import MVue from '../index.js'
 import updater from '../compile/updater'
 
-class ElementCompiler {
-  constructor(mVue, str) {
-    const tagName = str.match(/(\w|-)+/)[0]
-    this.tagName = tagName
-    this.el = null
-    // this.el = el
-    this.mVue = mVue
-    this.propsMatched = str.match(/\[(.+?)\]/)
-    this.textMatched = str.match(/\{(.+?)\}/)
-    this.eventMatched = str.match(/@(.+?)\@/)
-    // this.directiveMatched = str.match(/%(.+?)\%/)
-  }
-  init() {
-    if (MVue.Components[this.tagName]) {
-      const { options, component } = MVue.Components[this.tagName]
-      const mVue = new MVue(options)
-      if (this.propsMatched) {
-        this.propsMatched[1].split(',').forEach((item) => {
-          const [key, exp] = item.split('="')
-          if (/:/.test(key)) {
-            proxyProps({
-              cMVue: mVue,
-              mVue: this.mVue,
-              key: convertNamingFormat(key.slice(1)),
-              exp: exp
-            })
-          }
-        })
-      }
-      return component.createComponent(mVue)
-    } else {
-      this.el = document.createElement(this.tagName)
-      this.props()
-      this.el.textContent = this.text(true)
-      this.event()
-      return this.el
-    }
-  }
-  props() {
-    if (this.propsMatched) {
-      this.propsMatched[1].split(',').forEach((item) => {
-        const [key, exp] = item.split('="')
-        if (/:/.test(key)) {
-          console.log(key)
-        } else {
-          this.el.setAttribute(key, exp)
-        }
-      })
-    }
-  }
-  text(isFirst = false) {
-    if (this.textMatched) {
-      let textContent = this.textMatched[1]
-      const expMatched = textContent.match(/\$(.+?)\$/g)
-      if (expMatched) {
-        expMatched.forEach((item) => {
-          const exp = item.slice(1, item.length - 1)
-          if (isFirst) {
-            new Watcher(this.mVue, exp, (newVal, oldVal) => {
-              updater.text(this.el, this.text())
-            })
-          }
-          const getter = parsePath(exp)
-          const val = getter.call(this.mVue, this.mVue)
-          textContent = textContent.replace(item, val)
-        })
-      }
-      return textContent
-    }
-  }
-  event() {
-    if (this.eventMatched) {
-      let [eventName, fn] = this.eventMatched[1].split('=')
-      let isStop = false
-      let params = []
-      // 判断是否阻止事件冒泡
-      if (/\./.test(eventName)) {
-        eventName = eventName.split('.')[0]
-        isStop = true
-      }
-      if (/:/.test(fn)) {
-        ;[fn, ...params] = fn.split(':')
-      }
-      this.el.addEventListener(eventName, (e) => {
-        params = params.map((item) => {
-          if (this.mVue[item]) {
-            const getter = parsePath(item)
-            return getter.call(this.mVue, this.mVue)
-          }
-          return item
-        })
-        params.push(e)
-        this.mVue[fn](...params)
-        if (isStop) {
-          e.stopPropagation()
-        }
-        e.preventDefault()
-      })
-    }
-  }
-}
+import { ElementCompiler, ComponentCompiler } from './compiler.js'
 
 export default class Component {
   constructor(name, str) {
@@ -131,7 +31,7 @@ export default class Component {
         const elStr = str.match(/[^>+()]+/)[0]
         str = str.replace(elStr, '')
         console.log()
-        const el = cycleBind(elStr, this.mVue)
+        const el = createElements(elStr, this.mVue, pointer)
         calculate(el)
       } else {
         str = str.replace(firstCharacter, '')
@@ -165,7 +65,6 @@ export default class Component {
         } else {
           pointer = element
         }
-
         return
       }
       const preOperator = operators[operators.length - 1]
@@ -193,10 +92,50 @@ export default class Component {
     }
   }
 }
+// let i = 0
+/**
+ * 列表渲染只能渲染组件而且外面必须有包裹，即它前面的运算符为 '>'
+ * @param  {...any} args elStr mVue pointer
+ */
+function createElements(...args) {
+  const [str, mVue, pointer] = args
+  // console.log(str)
+
+  const tagName = str.match(/(\w|-)+/)[0]
+  if (MVue.Components[tagName]) {
+    const directiveMatched = str.match(/%(.+?)\%/)
+    if (directiveMatched) {
+      const [itemExp, parentExp] = directiveMatched[1].split(' in ')
+      new Watcher(mVue, parentExp, (newVal, oldVal) => {
+        updater.html(pointer, cycleBind(str, mVue, tagName, itemExp, parentExp))
+      })
+      return cycleBind(str, mVue, tagName, itemExp, parentExp)
+    }
+    return new ComponentCompiler(mVue, str, tagName).init()
+  }
+
+  return new ElementCompiler(mVue, str, tagName).init()
+}
 
 function cycleBind(...args) {
-  const [str, mVue] = args
-  const directiveMatched = str.match(/%(.+?)\%/)
-  console.log(directiveMatched)
-  return new ElementCompiler(mVue, str).init()
+  const [str, mVue, tagName, itemExp, parentExp] = args
+  const fragment = document.createDocumentFragment()
+  const propsMatched = str.match(/\[(.+?)\]/)
+  if (!propsMatched) {
+    return fragment
+  }
+
+  const getter = parsePath(parentExp)
+  const val = getter.call(mVue, mVue)
+  if (!Array.isArray(val)) {
+    return fragment
+  }
+
+  for (let i = 0; i < val.length; i++) {
+    const newExp = parentExp + '.' + i
+    let props = propsMatched[0].replace(itemExp, newExp)
+    const newElStr = str.replace(propsMatched[0], props)
+    fragment.appendChild(new ComponentCompiler(mVue, newElStr, tagName).init())
+  }
+  return fragment
 }

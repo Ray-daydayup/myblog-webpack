@@ -1,24 +1,14 @@
-export default {
+export const recentArticles = {
   name: 'recent-articles',
-  template: 'a@click=nav:a@%item in b%{$item$}+nav-statistics[:count="count]',
-  data() {
-    return {
-      a: 1,
-      b: [1, 2, 3],
-      count: {
-        articleCount: 0,
-        tagCount: 0,
-        categoryCount: 100
-      }
-    }
-  },
+  template: 'div>recent-articles-child%item in articles%[:article="item]'
+}
+
+export const recentArticlesChild = {
+  name: 'recent-articles-child',
+  template: 'a@click=nav:article@{$article.title$}',
   methods: {
     nav(a, e) {
-      this.count = {
-        articleCount: 10,
-        tagCount: 0,
-        categoryCount: 100
-      }
+      console.log(a, e)
     }
   }
 }
