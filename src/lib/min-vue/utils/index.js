@@ -58,7 +58,8 @@ export function proxyProps(option) {
     enumerable: true,
     get: function () {
       const getter = parsePath(exp)
-      return getter.call(mVue, mVue)
+      const val = getter.call(mVue, mVue)
+      return val
     }
   })
 }

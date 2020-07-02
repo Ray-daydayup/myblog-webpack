@@ -24,7 +24,7 @@ export default class MVue {
       MVue.Components[name] = { options, component }
     }
   }
-  render() {
+  render(callback) {
     const elSelector = this.elSelector
     const app = document.querySelector(elSelector)
     Object.keys(MVue.Components).forEach((name) => {
@@ -51,6 +51,9 @@ export default class MVue {
         })
       }
     })
+    if (callback) {
+      callback()
+    }
   }
 }
 MVue.Components = {}

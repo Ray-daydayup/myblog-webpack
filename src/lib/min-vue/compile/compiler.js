@@ -20,12 +20,21 @@ export class ElementCompiler {
   props() {
     if (this.propsMatched && /="/.test(this.propsMatched[1])) {
       this.propsMatched[1].split(',').forEach((item) => {
-        const [key, exp] = item.split('="')
-        if (/:/.test(key)) {
-          console.log(key)
-        } else {
-          this.el.setAttribute(key, exp)
+        let [key, exp] = item.split('="')
+        if (/\$/.test(exp)) {
+          let textContent = exp
+          const expMatched = textContent.match(/\$(.+?)\$/g)
+          if (expMatched) {
+            expMatched.forEach((item) => {
+              const exp = item.slice(1, item.length - 1)
+              const getter = parsePath(exp)
+              const val = getter.call(this.mVue, this.mVue)
+              textContent = textContent.replace(item, val)
+            })
+            exp = textContent
+          }
         }
+        this.el.setAttribute(key, exp)
       })
     }
   }
@@ -35,14 +44,21 @@ export class ElementCompiler {
       const expMatched = textContent.match(/\$(.+?)\$/g)
       if (expMatched) {
         expMatched.forEach((item) => {
-          const exp = item.slice(1, item.length - 1)
+          let exp = item.slice(1, item.length - 1)
+          let fn = null
+          if (/:/.test(exp)) {
+            ;[exp, fn] = exp.split(':')
+          }
           if (isFirst) {
             new Watcher(this.mVue, exp, (newVal, oldVal) => {
               updater.text(this.el, this.text())
             })
           }
           const getter = parsePath(exp)
-          const val = getter.call(this.mVue, this.mVue)
+          let val = getter.call(this.mVue, this.mVue)
+          if (fn) {
+            val = this.mVue[fn](val)
+          }
           textContent = textContent.replace(item, val)
         })
       }
@@ -62,16 +78,17 @@ export class ElementCompiler {
       if (/:/.test(fn)) {
         ;[fn, ...params] = fn.split(':')
       }
-      this.el.addEventListener(eventName, (e) => {
+      const mVue = this.mVue
+      this.el.addEventListener(eventName, function (e) {
         params = params.map((item) => {
-          if (this.mVue[item]) {
+          if (mVue[item]) {
             const getter = parsePath(item)
-            return getter.call(this.mVue, this.mVue)
+            return getter.call(mVue, mVue)
           }
           return item
         })
         params.push(e)
-        this.mVue[fn](...params)
+        mVue[fn](...params)
         if (isStop) {
           e.stopPropagation()
         }

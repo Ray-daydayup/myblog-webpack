@@ -68,17 +68,22 @@
           <div class="card-container hidden-slg">
             <%= require("html-loader!@/components/recent.html") %>
           </div>
-          <div class="card-container hidden-slg category-card-flag"></div>
-          <div class="card-container hidden-slg tags-card-flag"></div>
+          <div class="card-container hidden-slg category-card-flag">
+            <%= require("html-loader!@/components/category-card.html") %>
+          </div>
+          <div class="card-container hidden-slg tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
+          </div>
         </div>
         <!-- 中间文章列表 -->
         <div id="center-area" class="col-6-slg col-8-md">
-          <article id="articles-flag" class="article-list"></article>
-          <!-- <div class="card-container">
-          <div class="card-content get-more">
-            <a href="#">获取更多</a>
+          <article-list :articles="articles"></article-list>
+          <div class="card-container">
+            <div class="card-content get-more">
+              <a href="#">获取更多</a>
+            </div>
           </div>
-        </div> -->
+          <load-more :pages="pages" :fn="loadMore"></load-more>
         </div>
         <div class="col-3-slg col-4-md visible-sm">
           <div class="card-container">
@@ -88,16 +93,24 @@
           <div class="card-container hidden-slg recent-card-flag">
             <%= require("html-loader!@/components/recent.html") %>
           </div>
-          <div class="card-container hidden-slg category-card-flag"></div>
-          <div class="card-container hidden-slg tags-card-flag"></div>
+          <div class="card-container hidden-slg category-card-flag">
+            <%= require("html-loader!@/components/category-card.html") %>
+          </div>
+          <div class="card-container hidden-slg tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
+          </div>
         </div>
         <!-- 右边区域 -->
         <div id="right-area" class="col-3-slg visible-slg">
           <div class="card-container recent-card-flag">
             <%= require("html-loader!@/components/recent.html") %>
           </div>
-          <div class="card-container category-card-flag"></div>
-          <div class="card-container tags-card-flag"></div>
+          <div class="card-container category-card-flag">
+            <%= require("html-loader!@/components/category-card.html") %>
+          </div>
+          <div class="card-container tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
+          </div>
         </div>
       </div>
     </div>

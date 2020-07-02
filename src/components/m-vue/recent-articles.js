@@ -5,7 +5,7 @@ export const recentArticles = {
 
 export const recentArticlesChild = {
   name: 'recent-articles-child',
-  template: 'a@click=nav:article@{$article.title$}',
+  template: 'a@click.stop=nav:article@{$article.title$}[href="javascript:;]',
   methods: {
     nav(a, e) {
       console.log(a, e)

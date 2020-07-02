@@ -20,3 +20,8 @@ export const getTagList = async function () {
   const res = await http.get('/tag/list')
   return res
 }
+
+export const getCategories = async function () {
+  const res = await http.get('/category/list')
+  return res
+}
