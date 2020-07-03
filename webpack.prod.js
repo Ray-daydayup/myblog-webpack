@@ -76,18 +76,6 @@ module.exports = {
           name: 'commons',
           chunks: 'all',
           minChunks: 2
-        },
-        markdownIt: {
-          test: /[\\/]markdown-it[\\/]/,
-          chunks: 'all',
-          name: 'markdown-it',
-          filename: '[name].vendors.js'
-        },
-        highlight: {
-          test: /highlight/,
-          chunks: 'all',
-          name: 'highlight',
-          filename: '[name].vendors.js'
         }
       }
     }

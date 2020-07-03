@@ -7,7 +7,6 @@ import '@/utils/rem.js'
 import '@/utils/fixed.js'
 
 import MVue from '@/components/index'
-import abstractComponents from '././note-tips.js'
 import router from '@/utils/router.js'
 import {
   getCount,
@@ -17,22 +16,16 @@ import {
   getArticleById
 } from '@/api/index.js'
 
-abstractComponents.forEach((item) => {
-  MVue.Component(item)
-})
-
 MVue.router = router
 
-markdownRender(router.params.id, window.markdownItIntegrated)
+markdownRender(4, window.markdownItIntegrated)
 async function markdownRender(id, markdown) {
   const markdownBody = document.querySelector('#markdownBody')
-  const tocContainer = document.querySelector('#tocContainer')
   const res = await getArticleById(id)
   if (res.flag) {
     MVue.Event.emit('update-article', res.data)
     const content = res.data.content
     markdownBody.innerHTML = markdown.render(content)
-    tocContainer.innerHTML = markdown.toc
     document.querySelector('#mask').style.display = 'none'
   }
 }

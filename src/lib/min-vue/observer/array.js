@@ -19,7 +19,7 @@ const arrProto = Object.create(oldArrayProperty)
       }
       if (inserted) ob.observeArr(inserted)
       // updateView()
-      console.log('arrays', ob)
+      // console.log('arrays', ob)
       ob.dep.notify(true)
       return result
     }

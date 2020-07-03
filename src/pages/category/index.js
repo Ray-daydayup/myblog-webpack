@@ -1,41 +1,19 @@
-import '@/styles/iconfont.css'
-import '@/styles/markdown.less'
 import '@/styles/base.less'
 import '@/styles/grid.less'
-import '@/styles/detail.less'
+import '@/styles/iconfont.css'
 import '@/utils/rem.js'
 import '@/utils/fixed.js'
 
 import MVue from '@/components/index'
-import abstractComponents from '././note-tips.js'
 import router from '@/utils/router.js'
 import {
   getCount,
   getArticleList,
   getTagList,
-  getCategories,
-  getArticleById
+  getCategories
 } from '@/api/index.js'
 
-abstractComponents.forEach((item) => {
-  MVue.Component(item)
-})
-
 MVue.router = router
-
-markdownRender(router.params.id, window.markdownItIntegrated)
-async function markdownRender(id, markdown) {
-  const markdownBody = document.querySelector('#markdownBody')
-  const tocContainer = document.querySelector('#tocContainer')
-  const res = await getArticleById(id)
-  if (res.flag) {
-    MVue.Event.emit('update-article', res.data)
-    const content = res.data.content
-    markdownBody.innerHTML = markdown.render(content)
-    tocContainer.innerHTML = markdown.toc
-    document.querySelector('#mask').style.display = 'none'
-  }
-}
 
 const mVue = new MVue({
   el: '#app',
@@ -44,22 +22,41 @@ const mVue = new MVue({
       tag: 'tag',
       category: 'category'
     },
+    page: '分类',
     count: {},
+    tipText: '',
     recentArticles: [],
+    searchArticles: [],
     categories: [],
-    tags: [],
-    article: {}
+    tags: []
   },
   created() {
     this.getCount()
     this.getRecentArticles()
     this.getCategories()
     this.getTags()
-    this.$event.on('update-article', this.setArticle, this)
+    this.getSearchArticles()
+    this.$event.on('search-list', this.getSearchArticles, this)
   },
   methods: {
-    setArticle(article) {
-      this.article = article
+    async getSearchArticles(id) {
+      let option = { articleState: 1 }
+      if (id) {
+        option.categoryId = Number(id)
+      } else {
+        const params = this.$router.params
+        if (params) {
+          option.categoryId = Number(params.id)
+        }
+      }
+      const res = await getArticleList(1, 100, false, option)
+      if (res.flag) {
+        this.searchArticles = res.data
+        this.tipText = ''
+        if (res.data.length === 0) {
+          this.tipText = '没有找到该分类的文章'
+        }
+      }
     },
     async getCount() {
       const res = await getCount()
@@ -87,4 +84,6 @@ const mVue = new MVue({
     }
   }
 })
-mVue.render()
+mVue.render(() => {
+  document.querySelector('#mask').style.display = 'none'
+})

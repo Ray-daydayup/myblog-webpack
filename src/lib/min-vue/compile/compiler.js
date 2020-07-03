@@ -9,11 +9,16 @@ export class ElementCompiler {
     this.mVue = mVue
     this.propsMatched = str.match(/\[(.+?)\]/)
     this.textMatched = str.match(/\{(.+?)\}/)
+    this.htmlMatched = str.match(/\^(.+?)\^/)
     this.eventMatched = str.match(/@(.+?)\@/)
   }
   init() {
     this.props()
     this.el.textContent = this.text(true)
+    const inHtml = this.innerHtml(true)
+    if (inHtml) {
+      this.el.innerHTML = inHtml
+    }
     this.event()
     return this.el
   }
@@ -65,6 +70,28 @@ export class ElementCompiler {
       return textContent
     }
   }
+  innerHtml(isFirst = false) {
+    let val = ''
+    if (this.htmlMatched) {
+      let exp = this.htmlMatched[1]
+      let fn = null
+      if (/:/.test(exp)) {
+        ;[exp, fn] = exp.split(':')
+      }
+      if (isFirst) {
+        new Watcher(this.mVue, exp, (newVal, oldVal) => {
+          updater.innerHtml(this.el, this.innerHtml())
+        })
+      }
+      const getter = parsePath(exp)
+      val = getter.call(this.mVue, this.mVue)
+      if (fn) {
+        val = this.mVue[fn](val)
+      }
+    }
+    return val
+  }
+
   event() {
     if (this.eventMatched) {
       let [eventName, fn] = this.eventMatched[1].split('=')
@@ -80,15 +107,16 @@ export class ElementCompiler {
       }
       const mVue = this.mVue
       this.el.addEventListener(eventName, function (e) {
-        params = params.map((item) => {
+        // 引用类型，必须新建，否则参数会越来越多
+        const newParams = params.map((item) => {
           if (mVue[item]) {
             const getter = parsePath(item)
             return getter.call(mVue, mVue)
           }
           return item
         })
-        params.push(e)
-        mVue[fn](...params)
+        newParams.push(e)
+        mVue[fn](...newParams)
         if (isStop) {
           e.stopPropagation()
         }

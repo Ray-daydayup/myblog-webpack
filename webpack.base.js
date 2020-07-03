@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const path = require('path')
 const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const setMPA = () => {
   const entry = {}
@@ -58,7 +59,18 @@ const baseModuleRules = [
   }
 ]
 
-const basePlugins = [...htmlWebpackPlugins, new CleanWebpackPlugin()]
+const basePlugins = [
+  ...htmlWebpackPlugins,
+  new CleanWebpackPlugin(),
+  new CopyWebpackPlugin({
+    patterns: [
+      {
+        from: path.join(__dirname, 'src/lib/markdown-it'),
+        to: path.join(__dirname, 'dist/js/markdown-it')
+      }
+    ]
+  })
+]
 module.exports = {
   entry,
   baseModuleRules,

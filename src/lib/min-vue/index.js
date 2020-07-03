@@ -1,4 +1,5 @@
 import observe from './observer/index'
+import EventBus from './observer/event-bus'
 import Component from './compile/index'
 import { convertNamingFormat, proxyProps, proxy } from './utils/index'
 
@@ -9,6 +10,10 @@ export default class MVue {
       this.data = typeof data === 'function' ? data() : data
       proxy(this.data, this)
       observe(this.data)
+    }
+    this.$event = MVue.Event
+    if (MVue.router) {
+      this.$router = MVue.router
     }
     Object.assign(this, methods)
     created && created.call(this)
@@ -24,7 +29,7 @@ export default class MVue {
       MVue.Components[name] = { options, component }
     }
   }
-  render(callback) {
+  async render(callback) {
     const elSelector = this.elSelector
     const app = document.querySelector(elSelector)
     Object.keys(MVue.Components).forEach((name) => {
@@ -57,3 +62,4 @@ export default class MVue {
   }
 }
 MVue.Components = {}
+MVue.Event = new EventBus()

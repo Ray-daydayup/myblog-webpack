@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ray&#39;s Blog</title>
+    <title>关于-Ray&#39;s Blog</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css"
@@ -31,7 +31,7 @@
                 <!-- <a href="./archive.html">归档</a> -->
                 <a href="./tag.html">标签</a>
                 <a href="./category.html">分类</a>
-                <a href="./about.html">关于</a>
+                <a class="current" href="./about.html">关于</a>
               </div>
               <div class="menu-right fr">
                 <a href="https://github.com/Ray-daydayup/blog" target="_blank">
@@ -47,7 +47,7 @@
               <!-- <a href="./archive.html">归档</a> -->
               <a href="./tag.html">标签</a>
               <a href="./category.html">分类</a>
-              <a href="./about.html">关于</a>
+              <a class="current" href="./about.html">关于</a>
               <a href="https://github.com/Ray-daydayup/blog" target="_blank">
                 <i class="iconfont icon-github-fill"></i>
               </a>
@@ -72,8 +72,14 @@
             <%= require("html-loader?attributes=false!@/components/person.html")
             %>
           </div>
-          <div class="card-container hidden-sm">
-            <div id="tocContainer" class="card-content"></div>
+          <div class="card-container recent-card-flag">
+            <%= require("html-loader!@/components/recent.html") %>
+          </div>
+          <div class="card-container category-card-flag">
+            <%= require("html-loader!@/components/category-card.html") %>
+          </div>
+          <div class="card-container tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
           </div>
         </div>
         <!-- 中间文章列表 -->
@@ -81,20 +87,7 @@
           <article class="article-list">
             <div class="card-container">
               <div class="card-content main">
-                <div class="img-box">
-                  <img src="https://picsum.photos/1440/900/?random=1" />
-                </div>
-                <note-tips :article="article"></note-tips>
                 <div id="markdownBody" class="markdown-body"></div>
-                <div class="card-container recent-card-flag">
-                  <%= require("html-loader!@/components/recent.html") %>
-                </div>
-                <div class="card-container category-card-flag">
-                  <%= require("html-loader!@/components/category-card.html") %>
-                </div>
-                <div class="card-container tags-card-flag">
-                  <%= require("html-loader!@/components/tag-card.html") %>
-                </div>
               </div>
             </div>
           </article>
@@ -103,6 +96,15 @@
           <div class="card-container">
             <%= require("html-loader?attributes=false!@/components/person.html")
             %>
+          </div>
+          <div class="card-container recent-card-flag">
+            <%= require("html-loader!@/components/recent.html") %>
+          </div>
+          <div class="card-container category-card-flag">
+            <%= require("html-loader!@/components/category-card.html") %>
+          </div>
+          <div class="card-container tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
           </div>
         </div>
       </div>

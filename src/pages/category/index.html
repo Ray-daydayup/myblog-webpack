@@ -3,14 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ray&#39;s Blog</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css"
-    />
-    <script src="./js/markdown-it/highlight.vendors.js"></script>
-    <script src="./js/markdown-it/markdown-it.vendors.js"></script>
-    <script src="./js/markdown-it/markdown-it-integrated.min.js"></script>
+    <title>分类-Ray&#39;s Blog</title>
   </head>
 
   <body>
@@ -30,7 +23,7 @@
                 <a href="./index.html">首页</a>
                 <!-- <a href="./archive.html">归档</a> -->
                 <a href="./tag.html">标签</a>
-                <a href="./category.html">分类</a>
+                <a class="current" href="./category.html">分类</a>
                 <a href="./about.html">关于</a>
               </div>
               <div class="menu-right fr">
@@ -46,7 +39,7 @@
               <a href="./index.html">首页</a>
               <!-- <a href="./archive.html">归档</a> -->
               <a href="./tag.html">标签</a>
-              <a href="./category.html">分类</a>
+              <a class="current" href="./category.html">分类</a>
               <a href="./about.html">关于</a>
               <a href="https://github.com/Ray-daydayup/blog" target="_blank">
                 <i class="iconfont icon-github-fill"></i>
@@ -72,37 +65,37 @@
             <%= require("html-loader?attributes=false!@/components/person.html")
             %>
           </div>
-          <div class="card-container hidden-sm">
-            <div id="tocContainer" class="card-content"></div>
+          <div class="card-container hidden-slg">
+            <%= require("html-loader!@/components/recent.html") %>
+          </div>
+          <div class="card-container hidden-slg tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
           </div>
         </div>
         <!-- 中间文章列表 -->
-        <div id="center-area" class="col-8-md col-9-slg">
-          <article class="article-list">
-            <div class="card-container">
-              <div class="card-content main">
-                <div class="img-box">
-                  <img src="https://picsum.photos/1440/900/?random=1" />
-                </div>
-                <note-tips :article="article"></note-tips>
-                <div id="markdownBody" class="markdown-body"></div>
-                <div class="card-container recent-card-flag">
-                  <%= require("html-loader!@/components/recent.html") %>
-                </div>
-                <div class="card-container category-card-flag">
-                  <%= require("html-loader!@/components/category-card.html") %>
-                </div>
-                <div class="card-container tags-card-flag">
-                  <%= require("html-loader!@/components/tag-card.html") %>
-                </div>
-              </div>
-            </div>
-          </article>
+        <div id="center-area" class="col-6-slg col-8-md">
+          <links-box :items="categories" :page="page"></links-box>
+          <search-list :articles="searchArticles" :text="tipText"></search-list>
         </div>
         <div class="col-3-slg col-4-md visible-sm">
           <div class="card-container">
             <%= require("html-loader?attributes=false!@/components/person.html")
             %>
+          </div>
+          <div class="card-container hidden-slg recent-card-flag">
+            <%= require("html-loader!@/components/recent.html") %>
+          </div>
+          <div class="card-container hidden-slg tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
+          </div>
+        </div>
+        <!-- 右边区域 -->
+        <div id="right-area" class="col-3-slg visible-slg">
+          <div class="card-container recent-card-flag">
+            <%= require("html-loader!@/components/recent.html") %>
+          </div>
+          <div class="card-container tags-card-flag">
+            <%= require("html-loader!@/components/tag-card.html") %>
           </div>
         </div>
       </div>

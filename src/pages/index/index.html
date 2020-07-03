@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ray&#39;s Blog</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css"
+    />
+    <script src="./js/markdown-it/highlight.vendors.js"></script>
+    <script src="./js/markdown-it/markdown-it.vendors.js"></script>
+    <script src="./js/markdown-it/markdown-it-integrated.min.js"></script>
   </head>
 
   <body>
@@ -21,9 +28,9 @@
             <div class="visible-lg clearfix">
               <div class="menu-left fl">
                 <a class="current" href="./index.html">首页</a>
-                <a href="./archive.html">归档</a>
-                <a href="./tags.html">标签</a>
-                <a href="./categories.html">分类</a>
+                <!-- <a href="./archive.html">归档</a> -->
+                <a href="./tag.html">标签</a>
+                <a href="./category.html">分类</a>
                 <a href="./about.html">关于</a>
               </div>
               <div class="menu-right fr">
@@ -37,9 +44,9 @@
             </div>
             <div class="hidden-lg menu-not-lg">
               <a class="current" href="./index.html">首页</a>
-              <a href="./archive.html">归档</a>
-              <a href="./tags.html">标签</a>
-              <a href="./categories.html">分类</a>
+              <!-- <a href="./archive.html">归档</a> -->
+              <a href="./tag.html">标签</a>
+              <a href="./category.html">分类</a>
               <a href="./about.html">关于</a>
               <a href="https://github.com/Ray-daydayup/blog" target="_blank">
                 <i class="iconfont icon-github-fill"></i>
@@ -78,12 +85,7 @@
         <!-- 中间文章列表 -->
         <div id="center-area" class="col-6-slg col-8-md">
           <article-list :articles="articles"></article-list>
-          <div class="card-container">
-            <div class="card-content get-more">
-              <a href="#">获取更多</a>
-            </div>
-          </div>
-          <load-more :pages="pages" :fn="loadMore"></load-more>
+          <load-more :pages="pages"></load-more>
         </div>
         <div class="col-3-slg col-4-md visible-sm">
           <div class="card-container">

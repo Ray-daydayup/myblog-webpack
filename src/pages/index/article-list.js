@@ -23,16 +23,25 @@ const imgBox = {
 const noteTips = {
   name: 'note-tips',
   template:
-    'div[class="abstract]>(div[class="note-tips]>(i[class="iconfont icon-time-circle]+h6[class="font-regular]{ 创建时间：$article.createtime:time$ -- 修改时间：$article.modifiedtime:time$}))+(a@click.stop=nav:article@[href="javascript:;,class="title]>h2{$article.title$})+div{$article.abstract$}+div[class="category-nav]>(div[class="level-item]>i[class="iconfont icon-folder]+a[href="javascript:;]@click.stop=navCategory:article@{$article.category$})+div[class="level-item]>i[class="iconfont icon-tags]+span>tags-link%item in article.tags%[:tag="item]',
+    'div[class="abstract]>(div[class="note-tips]>(i[class="iconfont icon-time-circle]+h6[class="font-regular]{ 创建时间：$article.createtime:time$ -- 修改时间：$article.modifiedtime:time$}))+(a@click.stop=nav:article@[href="javascript:;,class="title]>h2{$article.title$})+div[class="markdown-body,style="padding: 0;]^article.abstract:markdown^+div[class="category-nav]>(div[class="level-item]>i[class="iconfont icon-folder]+a[href="javascript:;]@click.stop=navCategory:article@{$article.category$})+div[class="level-item]>i[class="iconfont icon-tags]+span>tags-link%item in article.tags%[:tag="item]',
   methods: {
     nav(article) {
-      console.log(article)
+      this.$router.navTo('./detail.html', {
+        id: article.article_id
+      })
     },
     navCategory(article) {
-      console.log(article.category_id)
+      const target = './category.html'
+      this.$router.navTo(target, {
+        id: article.category_id
+      })
     },
     time(val) {
       return timestampFormat(val)
+    },
+    markdown(val) {
+      const content = window.markdownItIntegrated.render(val)
+      return content
     }
   }
 }
@@ -42,7 +51,10 @@ const tagsLink = {
   template: 'a[href="javascript:;]@click.stop=navTag:tag@{$tag.name$}',
   methods: {
     navTag(tag) {
-      console.log(tag)
+      const target = './tag.html'
+      this.$router.navTo(target, {
+        id: tag.tagId
+      })
     }
   }
 }

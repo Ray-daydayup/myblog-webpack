@@ -1,10 +1,13 @@
 import '@/styles/base.less'
 import '@/styles/grid.less'
 import '@/styles/iconfont.css'
+import '@/styles/markdown.less'
 import '@/styles/index.less'
-import '@/lib/rem.js'
+import '@/utils/rem.js'
+import '@/utils/fixed.js'
 
 import MVue from '@/components/index'
+import router from '@/utils/router.js'
 import articleComponents from './article-list.js'
 import loadMore from './load-more.js'
 import {
@@ -14,6 +17,8 @@ import {
   getCategories
 } from '@/api/index.js'
 
+MVue.router = router
+
 articleComponents.forEach((item) => {
   MVue.Component(item)
 })
@@ -22,13 +27,13 @@ const mVue = new MVue({
   el: '#app',
   data: {
     flag: {
-      tag: 1,
-      category: 2
+      tag: 'tag',
+      category: 'category'
     },
     pages: {
       text: '获取更多',
       currentPage: 0,
-      pageSize: 1,
+      pageSize: 5,
       more: true
     },
     count: {},
@@ -43,10 +48,11 @@ const mVue = new MVue({
     this.getCategories()
     this.getTags()
     this.getArticles()
+    this.$event.on('load-more', this.getArticles, this)
   },
   methods: {
     loadMore() {
-      console.log()
+      console.log('出发了', this.flag)
     },
     async getCount() {
       const res = await getCount()
@@ -58,10 +64,12 @@ const mVue = new MVue({
       if (!this.pages.more) {
         return
       }
+      this.pages.currentPage++
       const res = await getArticleList(
-        this.pages.currentPage + 1,
+        this.pages.currentPage,
         this.pages.pageSize,
-        true
+        true,
+        { articleState: 1 }
       )
       if (res.flag) {
         if (res.data.length < this.pages.pageSize) {
@@ -72,7 +80,7 @@ const mVue = new MVue({
       }
     },
     async getRecentArticles() {
-      const res = await getArticleList(1, 5)
+      const res = await getArticleList(1, 10, false, { articleState: 1 })
       if (res.flag) {
         this.recentArticles = res.data
       }

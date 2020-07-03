@@ -7,8 +7,10 @@ export const recentArticlesChild = {
   name: 'recent-articles-child',
   template: 'a@click.stop=nav:article@{$article.title$}[href="javascript:;]',
   methods: {
-    nav(a, e) {
-      console.log(a, e)
+    nav(article) {
+      this.$router.navTo('./detail.html', {
+        id: article.article_id
+      })
     }
   }
 }

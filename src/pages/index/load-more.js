@@ -1,11 +1,10 @@
 export default {
   name: 'load-more',
   template:
-    'div[class="card-container]>div[class="card-content get-more]>a@click=test@[href="javascript:;]{$pages.text$}',
+    'div[class="card-container]>div[class="card-content get-more]>a@click=loadMore@[href="javascript:;]{$pages.text$}',
   methods: {
-    test() {
-      console.log(this.pages)
-      // this.fn()
+    loadMore() {
+      this.$event.emit('load-more')
     }
   }
 }

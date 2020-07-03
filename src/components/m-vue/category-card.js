@@ -8,9 +8,14 @@ export const categoryCardChild = {
   name: 'category-card-child',
   template: 'a@click.stop=nav:category@{$category.name$}[href="javascript:;]',
   methods: {
-    nav(a, e) {
-      console.log(this.flag)
-      console.log(a, e)
+    nav(a) {
+      let target = './category.html'
+      if (this.flag === 'tag') {
+        target = './tag.html'
+      }
+      this.$router.navTo(target, {
+        id: a.id
+      })
     }
   }
 }
