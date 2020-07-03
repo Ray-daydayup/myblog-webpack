@@ -51,9 +51,6 @@ const mVue = new MVue({
     this.$event.on('load-more', this.getArticles, this)
   },
   methods: {
-    loadMore() {
-      console.log('出发了', this.flag)
-    },
     async getCount() {
       const res = await getCount()
       if (res.flag) {

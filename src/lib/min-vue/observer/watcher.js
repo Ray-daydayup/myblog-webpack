@@ -15,7 +15,7 @@ export default class Watcher {
   addDep(dep) {
     dep.addSub(this)
   }
-  update(isArrayMethod = false) {
+  async update(isArrayMethod = false) {
     const value = this.get()
     if (this.value !== value || isArrayMethod || this.immediate) {
       this.callback(value, this.value)

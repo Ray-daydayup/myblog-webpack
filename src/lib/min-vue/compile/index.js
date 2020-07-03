@@ -15,7 +15,6 @@ export default class Component {
     this.mVue = mVue
     const fragment = this.createFragment(this.str)
     this.mVue = null
-    // console.log(fragment)
     return fragment
   }
   createFragment(string) {

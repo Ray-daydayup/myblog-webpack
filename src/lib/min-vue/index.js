@@ -16,13 +16,13 @@ export default class MVue {
       this.$router = MVue.router
     }
     Object.assign(this, methods)
+    // created访问不到props
     created && created.call(this)
     if (el) {
       this.elSelector = el
-      // this.render()
     }
   }
-  static Component(options) {
+  static async Component(options) {
     const { name, template } = options
     const component = new Component(name, template)
     if (!MVue.Components[name]) {
@@ -36,7 +36,8 @@ export default class MVue {
       const els = app.querySelectorAll(name)
       if (els.length > 0) {
         const { options, component } = MVue.Components[name]
-        els.forEach((element) => {
+        // 异步渲染
+        els.forEach(async (element) => {
           const mVue = new MVue(options)
           if (element.attributes.length > 0) {
             const attributes = [...element.attributes]

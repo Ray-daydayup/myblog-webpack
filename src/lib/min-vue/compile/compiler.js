@@ -14,10 +14,11 @@ export class ElementCompiler {
   }
   init() {
     this.props()
-    this.el.textContent = this.text(true)
     const inHtml = this.innerHtml(true)
     if (inHtml) {
       this.el.innerHTML = inHtml
+    } else {
+      this.el.textContent = this.text(true)
     }
     this.event()
     return this.el
