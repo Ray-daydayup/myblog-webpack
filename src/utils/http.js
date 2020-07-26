@@ -23,7 +23,7 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => {
     const result = handleResponse(response)
-    console.log(result)
+    // console.log(result)
     return result
   },
   (error) => {
